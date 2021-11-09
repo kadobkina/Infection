@@ -3,28 +3,36 @@
 
 using namespace std;
 
-class Board
+class Field
 {
 public:
-    vector<int> places;
+    int places[6][6];
 
-    Board(vector<int> pl)
+    Field()
     {
-        this->places = pl;
+        // начальное поле инфекции
+        for (int i = 0; i < 6; i++)
+            for (int j = 0; j < 6; j++)
+                places[i][j] = 0;
+        places[0][0] = 1;
+        places[0][5] = 2;
+        places[5][0] = 1;
+        places[5][5] = 2;
     }
 
-    void printBoard()
+    void printField()
     {
         cout << "   a b c d e f\n1  ";
-        int col = 0;
 
-        for (int p : places)
+        for (int i = 0; i < 6; i++)
         {
-            cout << p << " ";
-            col++;
-            if (col!= 36 && col % 6 == 0)
-                cout << endl << col / 6 + 1 << "  ";
+            for (int j = 0; j < 6; j++)
+                cout << places[i][j] << " ";
+            if (i != 5)
+                cout << endl << i + 2 << "  ";
         }
+
+        cout << endl;
     }
 };
 
@@ -32,9 +40,8 @@ int main()
 {
     setlocale(LC_ALL, "rus");
 
-    vector<int> pl = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    Board b(pl);
-    b.printBoard();
+    Field f;
+    f.printField();
         
 
     return 0;

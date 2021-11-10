@@ -49,41 +49,21 @@ public:
         this->field = f;
     }
 
+    // игра между двумя людьми
     void playGame()
     {
         while (true) {
-            switch (curPlayer)
-            {
-            case 1:
-            p1:            cout << "\nХодит 1-ый игрок:  ";
-                cin >> startPlace >> endPlace; // ход
+p:          cout << "\nХодит игрок №" << curPlayer << ":  ";
+            cin >> startPlace >> endPlace; // ход
 
-                placeToInt(startPlace, endPlace);
+            placeToInt(startPlace, endPlace);
 
-                if (!isCorrectMove(startPlace, endPlace))
-                    goto p1;
+            if (!isCorrectMove(startPlace, endPlace))
+                goto p;
 
-                if (abs((startPlace[1] - '0') - (endPlace[1] - '0')) == 2 || abs((startPlace[0] - '0') - (endPlace[0] - '0')) == 2)
-                    field.places[startPlace[1] - '0' - 1][startPlace[0] - '0' - 1] = 0;
-                field.places[endPlace[1] - '0' - 1][endPlace[0] - '0' - 1] = 1;
-
-
-                break;
-            case 2:
-            p2:            cout << "\nХодит 2-ой игрок:  ";
-                cin >> startPlace >> endPlace; // ход
-
-                placeToInt(startPlace, endPlace);
-
-                if (!isCorrectMove(startPlace, endPlace))
-                    goto p2;
-
-                if (abs((startPlace[1] - '0') - (endPlace[1] - '0')) == 2 || abs((startPlace[0] - '0') - (endPlace[0] - '0')) == 2)
-                    field.places[startPlace[1] - '0' - 1][startPlace[0] - '0' - 1] = 0;
-                field.places[endPlace[1] - '0' - 1][endPlace[0] - '0' - 1] = 2;
-
-                break;
-            }
+            if (abs((startPlace[1] - '0') - (endPlace[1] - '0')) == 2 || abs((startPlace[0] - '0') - (endPlace[0] - '0')) == 2)
+                field.places[startPlace[1] - '0' - 1][startPlace[0] - '0' - 1] = 0;
+            field.places[endPlace[1] - '0' - 1][endPlace[0] - '0' - 1] = curPlayer;
 
             field.printField();
 
@@ -92,6 +72,38 @@ public:
 
             curPlayer = curPlayer == 1 ? 2 : 1;
         }
+    }
+
+    // игра двух ботов
+    void playBotsGame()
+    {
+        // случайный выбор игрока, делающего 1-ый ход
+        int r = rand() % (9 + 1);
+        curPlayer = r > 4 ? 2 : 1;
+
+        while (true)
+        {
+            vector<pair<int, int>> possibleSteps = getPossibleSteps();
+
+            if (gameOver())
+                return;
+
+            curPlayer = curPlayer == 1 ? 2 : 1;
+        }
+    }
+
+    vector<pair<int,int>> getPossibleSteps()
+    {
+        vector<pair<int, int>> posSteps;
+        for (int i = 0; i < 6; i++)
+            for (int j = 0; j < 6; j++)
+            {
+                if (!(abs((startPlace[1] - '0') - j) > 2 || abs((startPlace[0] - '0') - i) > 2 || field.places[i][j] != 0))
+                {
+                    posSteps.push_back(pair<int, int>(i, j));
+                }
+            }
+        return posSteps;
     }
 
     bool gameOver()
@@ -188,20 +200,10 @@ public:
 
 
         // проверка начальной точки хода
-        switch (curPlayer)
+        if (field.places[startPlace[1] - '0' - 1][startPlace[0] - '0' - 1] != curPlayer)
         {
-        case 1:
-            if (field.places[startPlace[1] - '0' - 1][startPlace[0] - '0' - 1] != 1) {
-                cout << "\nНачальная точка не принадлежит 1-му игроку\n";
-                return false;
-            }
-            break;
-        case 2:
-            if (field.places[startPlace[1] - '0' - 1][startPlace[0] - '0' - 1] != 2) {
-                cout << "\nНачальная точка не принадлежит 2-му игроку\n";
-                return false;
-            }
-            break;
+            cout << "\nНачальная точка не принадлежит "<< curPlayer << "-му игроку\n";
+            return false;
         }
 
         // проверка конечной точки хода
@@ -223,7 +225,12 @@ int main()
     f.printField(); // вывод начального поля
         
     Infection inf(f);
-    inf.playGame();
+
+    // игра двух людей
+    //inf.playGame();
+
+    // игра двух ботов
+    //inf.playBotsGame();
 
     return 0;
 }

@@ -72,7 +72,7 @@ p:          cout << "\nХодит игрок №" << curPlayer << ":  ";
 
             field.printField();
 
-            if (gameOver())
+            if (gameOver(field))
             {
                 cout << "\nИгра окончена! ";
                 if (countFirst > countSecond)
@@ -119,7 +119,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                     tempField.places[i][j] = field.places[i][j];
 
             pair<int, pair<string, string>> ai_move = minimax(curPlayer, 4, tempField, -10, 10);
-            field.places[ai_move.second.second[1] - '0' - 1][ai_move.second.second[0] - '0' - 1] = curPlayer;
+            field.places[ai_move.second.second[1] - '0'][ai_move.second.second[0] - '0'] = curPlayer;
 
             startPlace = ai_move.second.first;
             endPlace = ai_move.second.second;
@@ -130,7 +130,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
 
             field.printField();
 
-            if (gameOver())
+            if (gameOver(field))
             {
                 cout << "\nИгра окончена! ";
                 if (countFirst > countSecond)
@@ -146,7 +146,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
         }
     }
 
-    pair<int, pair<string, string>> minimax(int player, int depth, Field& field, int alpha, int beta, pair<string, string> curMove = make_pair("", ""))
+    pair<int, pair<string, string>> minimax(int player, int depth, Field& tempField, int alpha, int beta, pair<string, string> curMove = make_pair("", ""))
     {
         //curPlayer = curPlayer == 1 ? 2 : 1;
         // лучший ход 
@@ -155,26 +155,26 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
         // AI = -10, player = 10
         int bestScore = player == 2 ? -1000 : 1000;
         pair<string, string> bestMove;
-        if (gameOver() || depth == 0)
+        if (gameOver(tempField) || depth == 0)
             return make_pair(bestScore, curMove);
 
 
         // все возможные ходы
-        vector<pair<string, string>> possibleSteps = getPossibleSteps(player);
+        vector<pair<string, string>> possibleSteps = getPossibleSteps(tempField, player);
 
         for (int i = 0; i < possibleSteps.size(); i++)
         {
             pair<string, string> curMove = make_pair(possibleSteps[i].first, possibleSteps[i].second);
             //field.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = curPlayer;
             if (abs((curMove.first[1] - '0') - (curMove.second[1] - '0')) == 2 || abs((curMove.first[0] - '0') - (curMove.second[0] - '0')) == 2)
-                field.places[curMove.first[0] - '0'][curMove.first[1] - '0'] = 0;
-            field.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = player;
+                tempField.places[curMove.first[0] - '0'][curMove.first[1] - '0'] = 0;
+            tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = player;
 
             bestMove = possibleSteps[i];
             if (player == 2)
             {
                 //curPlayer = 1;
-                int score = minimax(1, depth - 1, field, alpha, beta, bestMove).first;
+                int score = minimax(1, depth - 1, tempField, alpha, beta, bestMove).first;
 
                 if (bestScore < score)
                 {
@@ -182,7 +182,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                     bestMove = curMove;
 
                     alpha = max(alpha, bestScore);
-                    field.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
+                    tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
                     if (beta <= alpha)
                     {
                         break;
@@ -192,7 +192,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
             } 
             else
             {
-                int score = minimax(2, depth - 1, field, alpha, beta, bestMove).first;
+                int score = minimax(2, depth - 1, tempField, alpha, beta, bestMove).first;
 
                 if (bestScore > score)
                 {
@@ -200,7 +200,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                     bestMove = curMove;
 
                     beta = min(beta, bestScore);
-                    field.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
+                    tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
                     if (beta <= alpha)
                     {
                         break;
@@ -208,13 +208,13 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                 }
 
             }
-            field.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
+            tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
         }
         return make_pair(bestScore, bestMove);
     }
 
     // все возможные начальные точки хода
-    vector<string> getPossibleStart(int player)
+    vector<string> getPossibleStart(Field tempField, int player)
     {
         vector<string> posStart;
         for (int i = 0; i < 6; i++)
@@ -222,13 +222,13 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
             for (int j = 0; j < 6; j++)
             {
                 bool flag = false;
-                if (field.places[i][j] == player)
+                if (tempField.places[i][j] == player)
                 {
                     for (int ii = 0; ii < 6; ii++)
                     {
                         for (int jj = 0; jj < 6; jj++)
                         {
-                            if (!(abs(jj - j) > 2 || abs(ii - i) > 2 || field.places[ii][jj] != 0))
+                            if (!(abs(jj - j) > 2 || abs(ii - i) > 2 || tempField.places[ii][jj] != 0))
                             {
                                 string step = to_string(i) + to_string(j);
                                 posStart.push_back(step);
@@ -246,16 +246,16 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
     }
 
     // все возможные конечные точки хода
-    vector<pair<string, string>> getPossibleSteps(int player)
+    vector<pair<string, string>> getPossibleSteps(Field tempField, int player)
     {
         vector<pair<string, string>> posSteps;
-        vector<string> possibleStart = getPossibleStart(player);
+        vector<string> possibleStart = getPossibleStart(tempField, player);
         for (string from : possibleStart)
         {
             for (int i = 0; i < 6; i++)
                 for (int j = 0; j < 6; j++)
                 {
-                    if (!(abs((from[1] - '0') - j) > 2 || abs((from[0] - '0') - i) > 2 || field.places[i][j] != 0))
+                    if (!(abs((from[1] - '0') - j) > 2 || abs((from[0] - '0') - i) > 2 || tempField.places[i][j] != 0))
                     {
                         string to = to_string(i) + to_string(j);
                         posSteps.push_back(pair<string, string>(from, to));
@@ -265,7 +265,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
         return posSteps;
     }
 
-    bool gameOver()
+    bool gameOver(Field field)
     {
         for (int i = 0; i < 6; i++)
             for (int j = 0; j < 6; j++)
@@ -382,6 +382,8 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
         //cout << intStartPlace << " " << intEndPlace << endl;
         startPlace = intStartPlace;
         endPlace = intEndPlace;
+        startPlace[1]++;
+        endPlace[1]++;
     }
 
     bool isCorrectMove(string s, string e)

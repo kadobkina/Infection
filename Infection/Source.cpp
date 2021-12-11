@@ -118,7 +118,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                 for (int j = 0; j < 6; j++)
                     tempField.places[i][j] = field.places[i][j];
 
-            pair<int, pair<string, string>> ai_move = minimax(curPlayer, 0, tempField, -10, 10);
+            pair<int, pair<string, string>> ai_move = minimax(curPlayer, 4, tempField, -10, 10);
             field.places[ai_move.second.second[1] - '0' - 1][ai_move.second.second[0] - '0' - 1] = curPlayer;
 
             cout << "\nХодит игрок №" << curPlayer << ": " << ai_move.second.first << " " << ai_move.second.second << endl;
@@ -140,17 +140,18 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
         }
     }
 
-    pair<int, pair<string, string>> minimax(int player, int depth, Field& field, int alpha, int beta)
+    pair<int, pair<string, string>> minimax(int player, int depth, Field& field, int alpha, int beta, pair<string, string> curMove = make_pair("", ""))
     {
         //curPlayer = curPlayer == 1 ? 2 : 1;
         // лучший ход 
 
-        pair<string, string> bestMove = make_pair("", "");
-        // AI = 10, player = -10
-        int bestScore = player == 2 ? 10 : -10;
+        //pair<string, string> bestMove = make_pair("", "");
+        // AI = -10, player = 10
+        int bestScore = player == 2 ? -1000 : 1000;
+        pair<string, string> bestMove;
+        if (gameOver() || depth == 0)
+            return make_pair(bestScore, curMove);
 
-        if (gameOver())
-            return make_pair(bestScore, bestMove);
 
         // все возможные ходы
         vector<pair<string, string>> possibleSteps = getPossibleSteps(player);
@@ -163,10 +164,11 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                 field.places[curMove.first[0] - '0'][curMove.first[1] - '0'] = 0;
             field.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = player;
 
+            bestMove = possibleSteps[i];
             if (player == 2)
             {
                 //curPlayer = 1;
-                int score = minimax(1, depth + 1, field, alpha, beta).first;
+                int score = minimax(1, depth - 1, field, alpha, beta, bestMove).first;
 
                 if (bestScore < score)
                 {
@@ -184,7 +186,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
             } 
             else
             {
-                int score = minimax(2, depth + 1, field, alpha, beta).first;
+                int score = minimax(2, depth - 1, field, alpha, beta, bestMove).first;
 
                 if (bestScore > score)
                 {

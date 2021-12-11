@@ -121,7 +121,13 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
             pair<int, pair<string, string>> ai_move = minimax(curPlayer, 4, tempField, -10, 10);
             field.places[ai_move.second.second[1] - '0' - 1][ai_move.second.second[0] - '0' - 1] = curPlayer;
 
-            cout << "\nХодит игрок №" << curPlayer << ": " << ai_move.second.first << " " << ai_move.second.second << endl;
+            startPlace = ai_move.second.first;
+            endPlace = ai_move.second.second;
+            placeToString(startPlace, endPlace);
+
+            cout << "\nХодит игрок №" << curPlayer << ": " << startPlace << " " << endPlace << endl;
+            //cout << "\nХодит игрок №" << curPlayer << ": " << ai_move.second.first << " " << ai_move.second.second << endl;
+
             field.printField();
 
             if (gameOver())
@@ -317,6 +323,58 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
             break;
         default:
             intEndPlace += "6";
+            break;
+        }
+        intEndPlace += endPlace[1];
+
+        //cout << intStartPlace << " " << intEndPlace << endl;
+        startPlace = intStartPlace;
+        endPlace = intEndPlace;
+    }
+
+    void placeToString(string& startPlace, string& endPlace)
+    {
+        string intStartPlace = "", intEndPlace = "";
+        switch (startPlace[0]) {
+        case '0':
+            intStartPlace += "a";
+            break;
+        case '1':
+            intStartPlace += "b";
+            break;
+        case '2':
+            intStartPlace += "c";
+            break;
+        case '3':
+            intStartPlace += "d";
+            break;
+        case '4':
+            intStartPlace += "e";
+            break;
+        default:
+            intStartPlace += "f";
+            break;
+        }
+        intStartPlace += startPlace[1];
+
+        switch (endPlace[0]) {
+        case '0':
+            intEndPlace += "a";
+            break;
+        case '1':
+            intEndPlace += "b";
+            break;
+        case '2':
+            intEndPlace += "c";
+            break;
+        case '3':
+            intEndPlace += "d";
+            break;
+        case '4':
+            intEndPlace += "e";
+            break;
+        default:
+            intEndPlace += "f";
             break;
         }
         intEndPlace += endPlace[1];

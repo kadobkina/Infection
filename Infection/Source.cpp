@@ -48,6 +48,7 @@ public:
     int countFirst = 0, countSecond = 0;
     const int MAX = 1000;
     const int MIN = -1000;
+    bool stepExist = true;
 
     Infection(Field f)
     {
@@ -79,6 +80,8 @@ p:          cout << "\nХодит игрок №" << curPlayer << ":  ";
                     cout << "Победу одержал 1-ый игрок!\n";
                 else if (countFirst < countSecond)
                     cout << "Победу одержал 2-ой игрок!\n";
+                else if (countFirst == countSecond)
+                    cout << "Победу одержал 2-ой игрок!\n";
                 else
                     cout << "Ничья!\n";
                 return;
@@ -97,8 +100,8 @@ p:          cout << "\nХодит игрок №" << curPlayer << ":  ";
 
         while (true)
         {
-            curPlayer = 1;
-p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
+p1:         curPlayer = 1;
+            cout << "\nХодит игрок №" << curPlayer << ":  ";
             cin >> startPlace >> endPlace; // ход
 
             placeToInt(startPlace, endPlace);
@@ -111,6 +114,20 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
             field.places[endPlace[1] - '0' - 1][endPlace[0] - '0' - 1] = curPlayer;
 
             field.printField();
+
+            if (gameOver(field))
+            {
+                cout << "\nИгра окончена! ";
+                if (countFirst > countSecond)
+                    cout << "Победу одержал 1-ый игрок!\n";
+                else if (countFirst < countSecond)
+                    cout << "Победу одержал 2-ой игрок!\n";
+                else
+                    cout << "Ничья!\n";
+                return;
+            }
+
+
             curPlayer = 2;
             Field tempField;
             for (int i = 0; i < 6; i++)
@@ -118,6 +135,10 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                     tempField.places[i][j] = field.places[i][j];
 
             pair<int, pair<string, string>> ai_move = minimax(curPlayer, 4, tempField, -10, 10);
+
+            if (ai_move.second.second == "" || ai_move.second.first == "")
+                goto p1;
+
             field.places[ai_move.second.second[0] - '0'][ai_move.second.second[1] - '0'] = curPlayer;
 
             startPlace = ai_move.second.first;
@@ -161,6 +182,9 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
         // все возможные ходы
         vector<pair<string, string>> possibleSteps = getPossibleSteps(tempField, player);
 
+        if (possibleSteps.size() == 0)
+            stepExist = false;
+
         for (int i = 0; i < possibleSteps.size(); i++)
         {
             pair<string, string> curMove = make_pair(possibleSteps[i].first, possibleSteps[i].second);
@@ -181,7 +205,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                     bestMove = curMove;
 
                     alpha = max(alpha, bestScore);
-                    //tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
+                    tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
                     if (beta <= alpha)
                     {
                         break;
@@ -199,7 +223,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                     bestMove = curMove;
 
                     beta = min(beta, bestScore);
-                    //tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
+                    tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
                     if (beta <= alpha)
                     {
                         break;
@@ -207,7 +231,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                 }
 
             }
-            //tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
+            tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
         }
         return make_pair(bestScore, bestMove);
     }
@@ -266,6 +290,8 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
 
     bool gameOver(Field field)
     {
+        countFirst = 0;
+        countSecond = 0;
         for (int i = 0; i < 6; i++)
             for (int j = 0; j < 6; j++)
             {
@@ -273,8 +299,10 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                     countFirst++;
                 if (field.places[i][j] == 2)
                     countSecond++;
+                //if (stepExist)
+                //    return false;
                 if (field.places[i][j] == 0)
-                    return false; // игра не окончена
+                    return false;
             }
         return true;
     }

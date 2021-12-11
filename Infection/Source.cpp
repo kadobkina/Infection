@@ -111,7 +111,6 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
             field.places[endPlace[1] - '0' - 1][endPlace[0] - '0' - 1] = curPlayer;
 
             field.printField();
-
             curPlayer = 2;
             Field tempField;
             for (int i = 0; i < 6; i++)
@@ -119,7 +118,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                     tempField.places[i][j] = field.places[i][j];
 
             pair<int, pair<string, string>> ai_move = minimax(curPlayer, 4, tempField, -10, 10);
-            field.places[ai_move.second.second[1] - '0'][ai_move.second.second[0] - '0'] = curPlayer;
+            field.places[ai_move.second.second[0] - '0'][ai_move.second.second[1] - '0'] = curPlayer;
 
             startPlace = ai_move.second.first;
             endPlace = ai_move.second.second;
@@ -182,7 +181,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                     bestMove = curMove;
 
                     alpha = max(alpha, bestScore);
-                    tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
+                    //tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
                     if (beta <= alpha)
                     {
                         break;
@@ -200,7 +199,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                     bestMove = curMove;
 
                     beta = min(beta, bestScore);
-                    tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
+                    //tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
                     if (beta <= alpha)
                     {
                         break;
@@ -208,7 +207,7 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
                 }
 
             }
-            tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
+            //tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
         }
         return make_pair(bestScore, bestMove);
     }
@@ -334,6 +333,14 @@ p1:         cout << "\nХодит игрок №" << curPlayer << ":  ";
 
     void placeToString(string& startPlace, string& endPlace)
     {
+        auto t = startPlace[0];
+        startPlace[0] = startPlace[1];
+        startPlace[1] = t;
+
+        t = endPlace[0];
+        endPlace[0] = endPlace[1];
+        endPlace[1] = t;
+
         string intStartPlace = "", intEndPlace = "";
         switch (startPlace[0]) {
         case '0':

@@ -71,6 +71,13 @@ p:          cout << "\nХодит игрок №" << curPlayer << ":  ";
                 field.places[startPlace[1] - '0' - 1][startPlace[0] - '0' - 1] = 0;
             field.places[endPlace[1] - '0' - 1][endPlace[0] - '0' - 1] = curPlayer;
 
+            for (int i = 0; i < 6; i++)
+                for (int j = 0; j < 6; j++)
+                {
+                    if (abs((startPlace[1] - '0') - (endPlace[1] - '0')) == 1 || abs((startPlace[0] - '0') - (endPlace[0] - '0')) == 1 && field.places[i][j] != 0)
+                        field.places[i][j] == curPlayer;
+                }
+
             field.printField();
 
             if (gameOver(field))
@@ -113,6 +120,22 @@ p1:         curPlayer = 1;
                 field.places[startPlace[1] - '0' - 1][startPlace[0] - '0' - 1] = 0;
             field.places[endPlace[1] - '0' - 1][endPlace[0] - '0' - 1] = curPlayer;
 
+            Field tempField;
+            for (int i = 0; i < 6; i++)
+                for (int j = 0; j < 6; j++)
+                    tempField.places[i][j] = field.places[i][j];
+
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < 6; j++)
+                {
+                    if (abs(endPlace[1] - '0' - 1 - i) <= 1 && abs(endPlace[0] - '0' - 1 - j) <= 1 && tempField.places[i][j] == 2)
+                    {
+                        field.places[i][j] = 1;
+                    }
+                }
+            }
+
             field.printField();
 
             if (gameOver(field))
@@ -129,7 +152,6 @@ p1:         curPlayer = 1;
 
 
             curPlayer = 2;
-            Field tempField;
             for (int i = 0; i < 6; i++)
                 for (int j = 0; j < 6; j++)
                     tempField.places[i][j] = field.places[i][j];
@@ -139,6 +161,8 @@ p1:         curPlayer = 1;
             if (ai_move.second.second == "" || ai_move.second.first == "")
                 goto p1;
 
+            if (abs((ai_move.second.first[1] - '0') - (ai_move.second.second[1] - '0')) == 2 || abs((ai_move.second.first[0] - '0') - (ai_move.second.second[0] - '0')) == 2)
+                field.places[ai_move.second.first[0] - '0'][ai_move.second.first[1] - '0'] = 0;
             field.places[ai_move.second.second[0] - '0'][ai_move.second.second[1] - '0'] = curPlayer;
 
             startPlace = ai_move.second.first;
@@ -147,6 +171,22 @@ p1:         curPlayer = 1;
 
             cout << "\nХодит игрок №" << curPlayer << ": " << startPlace << " " << endPlace << endl;
             //cout << "\nХодит игрок №" << curPlayer << ": " << ai_move.second.first << " " << ai_move.second.second << endl;
+
+            curPlayer = 2;
+            for (int i = 0; i < 6; i++)
+                for (int j = 0; j < 6; j++)
+                    tempField.places[i][j] = field.places[i][j];
+
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < 6; j++)
+                {
+                    if (abs(ai_move.second.second[0] - '0' - i) <= 1 && abs(ai_move.second.second[1] - '0' - j) <= 1 && tempField.places[i][j] == 1)
+                    {
+                        field.places[i][j] = 2;
+                    }
+                }
+            }
 
             field.printField();
 
@@ -192,6 +232,18 @@ p1:         curPlayer = 1;
             if (abs((curMove.first[1] - '0') - (curMove.second[1] - '0')) == 2 || abs((curMove.first[0] - '0') - (curMove.second[0] - '0')) == 2)
                 tempField.places[curMove.first[0] - '0'][curMove.first[1] - '0'] = 0;
             tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = player;
+
+            Field temptempField;
+            for (int i = 0; i < 6; i++)
+                for (int j = 0; j < 6; j++)
+                    temptempField.places[i][j] = tempField.places[i][j];
+
+            for (int ii = 0; ii < 6; ii++)
+                for (int jj = 0; jj < 6; jj++)
+                {
+                    if (abs(curMove.second[1] - '0' - ii) <= 1 && abs(curMove.second[0] - jj) <= 1  && temptempField.places[ii][jj] != 0)
+                        tempField.places[ii][jj] == player;
+                }
 
             bestMove = possibleSteps[i];
             if (player == 2)

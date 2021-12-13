@@ -75,7 +75,7 @@ p:          cout << "\nХодит игрок №" << curPlayer << ":  ";
                 for (int j = 0; j < 6; j++)
                 {
                     if (abs((startPlace[1] - '0') - (endPlace[1] - '0')) == 1 || abs((startPlace[0] - '0') - (endPlace[0] - '0')) == 1 && field.places[i][j] != 0)
-                        field.places[i][j] == curPlayer;
+                        field.places[i][j] = curPlayer;
                 }
 
             field.printField();

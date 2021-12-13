@@ -242,7 +242,7 @@ p1:         curPlayer = 1;
                 for (int jj = 0; jj < 6; jj++)
                 {
                     if (abs(curMove.second[1] - '0' - ii) <= 1 && abs(curMove.second[0] - jj) <= 1  && temptempField.places[ii][jj] != 0)
-                        tempField.places[ii][jj] == player;
+                        tempField.places[ii][jj] = player;
                 }
 
             bestMove = possibleSteps[i];

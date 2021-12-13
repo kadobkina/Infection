@@ -349,14 +349,10 @@ p1:         curPlayer = 1;
             {
                 if (field.places[i][j] == 1)
                     countFirst++;
-                if (field.places[i][j] == 2)
+                else if (field.places[i][j] == 2)
                     countSecond++;
-                //if (stepExist)
-                //    return false;
-                if (field.places[i][j] == 0)
-                    return false;
             }
-        return true;
+        return countFirst == 0 || countSecond == 0 || countFirst + countSecond == 36 ? true : false;
     }
 
     void placeToInt(string& startPlace, string& endPlace)

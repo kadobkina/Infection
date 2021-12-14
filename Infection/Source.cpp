@@ -48,8 +48,6 @@ public:
     string startPlace, endPlace;
     Field field;
     int countFirst = 0, countSecond = 0;
-    const int MAX = 1000;
-    const int MIN = -1000;
 
     Infection(Field f)
     {
@@ -155,7 +153,7 @@ p1:         curPlayer = 1;
                 for (int j = 0; j < 6; j++)
                     tempField.places[i][j] = field.places[i][j];
 
-            pair<int, pair<string, string>> ai_move = minimax(curPlayer, 0, tempField, MIN, MAX);
+            pair<int, pair<string, string>> ai_move = minimax(curPlayer, 0, tempField, -40, 40);
 
             if (ai_move.second.second == "" || ai_move.second.first == "")
                 goto p1;
@@ -210,10 +208,14 @@ p1:         curPlayer = 1;
 
         //pair<string, string> bestMove = make_pair("", "");
         // AI = -10, player = 10
-        int bestScore = player == 2 ? -1000 : 1000;
+        //int bestScore = player == 2 ? beta : alpha;
+
         pair<string, string> bestMove;
         if (gameOver(tempField) || depth == 4)
-            return make_pair(bestScore, curMove);
+        {
+            int diff = countFirst - countSecond;
+            return player == 1 ? make_pair(diff, curMove) : make_pair(-diff, curMove);
+        }
 
 
         // все возможные ходы
@@ -221,29 +223,41 @@ p1:         curPlayer = 1;
 
         for (int i = 0; i < possibleSteps.size(); i++)
         {
-            curMove = make_pair(possibleSteps[i].first, possibleSteps[i].second);
-            //field.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = curPlayer;
-            if (abs((curMove.first[1] - '0') - (curMove.second[1] - '0')) == 2 || abs((curMove.first[0] - '0') - (curMove.second[0] - '0')) == 2)
-                tempField.places[curMove.first[0] - '0'][curMove.first[1] - '0'] = 0;
-            tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = player;
-
             Field temptempField;
             for (int i = 0; i < 6; i++)
                 for (int j = 0; j < 6; j++)
                     temptempField.places[i][j] = tempField.places[i][j];
 
+            curMove = make_pair(possibleSteps[i].first, possibleSteps[i].second);
+            //field.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = curPlayer;
+            if (abs((curMove.first[1] - '0') - (curMove.second[1] - '0')) == 2 || abs((curMove.first[0] - '0') - (curMove.second[0] - '0')) == 2)
+                temptempField.places[curMove.first[0] - '0'][curMove.first[1] - '0'] = 0;
+            temptempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = player;
+
             for (int i = 0; i < 6; i++)
                 for (int j = 0; j < 6; j++)
                 {
-                    if (abs(curMove.second[0] - '0' - i) <= 1 && abs(curMove.second[1] - '0' - j) <= 1  && temptempField.places[i][j] != 0)
-                        tempField.places[i][j] = player;
+                    if (abs(curMove.second[0] - '0' - i) <= 1 && abs(curMove.second[1] - '0' - j) <= 1  && tempField.places[i][j] != 0)
+                        temptempField.places[i][j] = player;
                 }
 
-            //bestMove = curMove;
+            int oppPlayer = player == 1 ? 2 : 1;
+            int score = minimax(oppPlayer, depth + 1, temptempField, -beta, -alpha, curMove).first;
+            score = -score;
+            if (alpha < score)
+            {
+                alpha = score;
+                bestMove = curMove;
+                if (beta <= alpha)
+                {
+                    break;
+                }
+            }
+
+       /*    
             if (player == 2)
             {
-                //curPlayer = 1;
-                int score = minimax(1, depth + 1, tempField, alpha, beta, curMove).first;
+                int score = minimax(1, depth + 1, temptempField, alpha, beta, curMove).first;
 
                 if (bestScore <= score)
                 {
@@ -251,7 +265,7 @@ p1:         curPlayer = 1;
                     bestMove = curMove;
 
                     alpha = max(alpha, bestScore);
-                    tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
+                    //tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = 0;
                     if (beta <= alpha)
                     {
                         break;
@@ -261,7 +275,7 @@ p1:         curPlayer = 1;
             } 
             else
             {
-                int score = minimax(2, depth + 1, tempField, alpha, beta, curMove).first;
+                int score = minimax(2, depth + 1, temptempField, alpha, beta, curMove).first;
 
                 if (bestScore >= score)
                 {
@@ -269,17 +283,17 @@ p1:         curPlayer = 1;
                     bestMove = curMove;
 
                     beta = min(beta, bestScore);
-                    tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
+                    //tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = 0;
                     if (beta <= alpha)
                     {
                         break;
                     }
                 }
 
-            }
-            tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = -1;
+            }*/
+            //tempField.places[curMove.second[0] - '0'][curMove.second[1] - '0'] = 0;
         }
-        return make_pair(bestScore, bestMove);
+        return make_pair(alpha, bestMove);
     }
 
     // все возможные начальные точки хода
